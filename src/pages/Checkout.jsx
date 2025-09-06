@@ -15,7 +15,7 @@ const orderData = {
 };
 
 const Checkout = () => {
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState("Processing your order...");
 
   useEffect(() => {
     const saveOrder = async () => {
@@ -27,7 +27,13 @@ const Checkout = () => {
         });
 
         const data = await res.json();
-        setMessage(data.message); // ✅ Now visible in UI
+        console.log("Backend response:", data); // <-- log full response
+
+        if (res.ok) {
+          setMessage(data.message); // show success
+        } else {
+          setMessage(data.error || "Error saving order. Please try again.");
+        }
       } catch (err) {
         console.error("Error saving order:", err);
         setMessage("Error saving order. Please try again.");
@@ -41,7 +47,7 @@ const Checkout = () => {
     <div className="checkoutMessage">
       <div className="checkoutTitleContainer">
         <AiFillCheckCircle className="checkoutIcon" />
-        <h3>{message || "Processing your order..."}</h3>
+        <h3>{message}</h3>
       </div>
       <span>
         Your order is being processed and will be delivered as fast as possible.

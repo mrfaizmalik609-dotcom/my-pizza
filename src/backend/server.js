@@ -4,18 +4,22 @@ import cors from "cors";
 
 const app = express();
 
+// ===================
 // ✅ Middleware
+// ===================
 app.use(cors());
 app.use(express.json());
 
+// ===================
 // ✅ MongoDB Connect
+// ===================
 mongoose
     .connect(
         "mongodb+srv://mrfaizmalik609_db_user:k8Gk57ZeE5H3F3Jo@project1.d5ur6je.mongodb.net/contactDB",
         { useNewUrlParser: true, useUnifiedTopology: true }
     )
     .then(() => console.log("✅ MongoDB Connected"))
-    .catch((err) => console.log("❌ Error:", err));
+    .catch((err) => console.log("❌ MongoDB Connection Error:", err));
 
 // ===================
 // ✅ Contact Schema
@@ -66,15 +70,17 @@ app.post("/api/contact", async (req, res) => {
         const { name, email, subject, message } = req.body;
 
         if (!name || !email || !subject || !message) {
+            console.log("Contact validation failed:", req.body);
             return res.status(400).json({ error: "All fields are required" });
         }
 
         const newContact = new Contact({ name, email, subject, message });
         await newContact.save();
 
+        console.log("Contact saved:", req.body);
         res.status(201).json({ message: "Contact saved successfully!" });
     } catch (error) {
-        console.error(error);
+        console.error("Error saving contact:", error);
         res.status(500).json({ error: "Error saving contact" });
     }
 });
@@ -86,16 +92,20 @@ app.post("/api/checkout", async (req, res) => {
     try {
         const { items, total, customerName, email, address, paymentMethod } = req.body;
 
+        console.log("Checkout request body:", req.body);
+
         if (!items || !total || !customerName || !email || !address || !paymentMethod) {
+            console.log("Checkout validation failed");
             return res.status(400).json({ error: "All fields are required" });
         }
 
         const newOrder = new Checkout({ items, total, customerName, email, address, paymentMethod });
         await newOrder.save();
 
+        console.log("Order saved successfully:", req.body);
         res.status(201).json({ message: "Order saved successfully!" });
     } catch (error) {
-        console.error(error);
+        console.error("Error saving order:", error);
         res.status(500).json({ error: "Error saving order" });
     }
 });
